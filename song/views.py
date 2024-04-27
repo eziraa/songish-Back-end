@@ -41,3 +41,25 @@ class SignUpView(View):
             return JsonResponse(CustomerSerializer(result).data, status=201)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON."}, status=400)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LogIndView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+            password = data.get('password')
+            customer = Customer.objects.get(email=email)
+            if check_password(password, customer.password):
+                # favorite_songs_i = [
+                #     song.id for song in customer.favorite_songs]
+                # my__songs_i = [
+                #     song.id for song in customer.favorite_songs]
+                serializer = CustomerSerializer(customer)
+                return JsonResponse(serializer.data, safe=False)
+            else:
+                return JsonResponse({"error": "Password is incorrect."}, status=400)
+        except ObjectDoesNotExist:
+            print("object does not exist")
+            return JsonResponse({"error": "User does not exist not found."}, status=404)
