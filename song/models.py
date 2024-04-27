@@ -15,8 +15,6 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.name
-
-
 class Song(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=200)
@@ -30,6 +28,20 @@ class Song(models.Model):
         upload_to='songs/', default=None, null=True, blank=True)
     customer = models.ForeignKey(
         Customer, on_delete=models.CASCADE, related_name='songs', null=True, blank=True)
-
     def __str__(self):
         return self.title
+
+
+class Playlist(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    created_at = models.DateField(auto_now_add=True)
+    customer = models.ForeignKey(
+        Customer, default="", blank=True, null=True, on_delete=models.CASCADE)
+    song = models.ManyToManyField(
+        Song, related_name="playlist", blank=True)
+    image = models.FileField(
+        upload_to='images/', default=None, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
