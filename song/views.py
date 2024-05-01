@@ -63,3 +63,20 @@ class LogIndView(View):
         except ObjectDoesNotExist:
             print("object does not exist")
             return JsonResponse({"error": "User does not exist not found."}, status=404)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AddSongView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            customer_id = data.get('user_id')
+            song_data = {k: v for k, v in data.items() if k != 'user_id'}
+            customer = Customer.objects.get(id=customer_id)
+            song = Song.objects.create(customer=customer, **song_data)
+            serializer = SongSerializer(song)
+            return JsonResponse(serializer.data, safe=False)
+        except ObjectDoesNotExist:
+            return JsonResponse({"error": "Song not found."}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON."}, status=400)
