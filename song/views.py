@@ -92,3 +92,28 @@ class GetSongsView(View):
             return JsonResponse({"error": "Songs not found."}, status=404)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON."}, status=400)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def song_detail(request):
+    try:
+        request.data['duration'] = int(float(request.data['duration']))
+        song = Song.objects.get(pk=request.data['id'])
+    except Song.DoesNotExist:
+        return Response(status=404)
+
+    if request.method == 'GET':
+        serializer = SongSerializer(song)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = SongSerializer(song, data=request.data)
+        print(request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    elif request.method == 'DELETE':
+        song.delete()
+        return Response(status=204)
