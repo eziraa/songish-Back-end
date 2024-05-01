@@ -80,3 +80,15 @@ class AddSongView(View):
             return JsonResponse({"error": "Song not found."}, status=404)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON."}, status=400)
+
+
+class GetSongsView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            songs = Song.objects.all()
+            serializer = SongSerializer(songs, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        except ObjectDoesNotExist:
+            return JsonResponse({"error": "Songs not found."}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON."}, status=400)
