@@ -16,6 +16,7 @@ from django.views.decorators.http import require_http_methods
 from .models import Playlist, Customer
 
 
+
 @api_view(['POST'])
 def create_playlist(request):
     # data = json.loads(request.body)
@@ -25,3 +26,15 @@ def create_playlist(request):
     playlist = Playlist.objects.create(customer=customer, **playlist_data)
     serializer = PlaylistSerializer(playlist)
     return JsonResponse(serializer.data, status=201)
+
+
+@api_view(["DELETE"])
+def delete_playlist(request, playlist_id):
+    try:
+
+        playlist = Playlist.objects.get(id=playlist_id)
+        playlist.delete()
+
+        return JsonResponse({'message': 'Playlist deleted successfully'}, status=200)
+    except Playlist.DoesNotExist:
+        return JsonResponse({'error': 'Playlist not found'}, status=404)
