@@ -45,3 +45,24 @@ def getPlaylists(request, user_id):
     playlists = Playlist.objects.filter(customer_id=user_id)
     serializer = PlaylistSerializer(playlists, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+def get_song_in_playlist(request):
+
+    playlist = get_object_or_404(Playlist, id=request.data["playlist_id"])
+    song_list = playlist.song.all()
+
+    paginator = Paginator(song_list, 10)  # Show 10 song items per page
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    song_list = list(page_obj.object_list.values())
+
+    return JsonResponse({
+        'song': song_list,
+        'has_previous': page_obj.has_previous(),
+        'has_next': page_obj.has_next(),
+        'number': page_obj.number,
+        'num_pages': paginator.num_pages,
+    })
