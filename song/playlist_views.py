@@ -38,8 +38,6 @@ def delete_playlist(request, playlist_id):
         return JsonResponse({'message': 'Playlist deleted successfully'}, status=200)
     except Playlist.DoesNotExist:
         return JsonResponse({'error': 'Playlist not found'}, status=404)
-
-
 @api_view(['GET'])
 def getPlaylists(request, user_id):
     playlists = Playlist.objects.filter(customer_id=user_id)
@@ -52,11 +50,13 @@ def get_song_in_playlist(request):
     playlist = get_object_or_404(Playlist, id=request.data["playlist_id"])
     song_list = playlist.song.all()
 
+    # Create a Paginator object
     paginator = Paginator(song_list, 10)  # Show 10 song items per page
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    # Convert the Page object to a list so it can be serialized to JSON
     song_list = list(page_obj.object_list.values())
 
     return JsonResponse({
@@ -100,3 +100,13 @@ def get_song_in_playlist(request, playlist_id):
     playlist = get_object_or_404(Playlist, id=playlist_id)
     serializer = SongSerializer(playlist.song, many=True)
     return JsonResponse(serializer.data, safe=False)
+
+
+class DeletePlaylistView(View):
+    def delete(self, request, playlist_id):
+        try:
+            playlist = Playlist.objects.get(id=playlist_id)
+            playlist.delete()
+            return JsonResponse({'message': 'Playlist deleted successfully'}, status=200)
+        except Playlist.DoesNotExist:
+            return JsonResponse({'error': 'Playlist not found'}, status=404)
