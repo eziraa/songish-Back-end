@@ -66,3 +66,21 @@ def get_song_in_playlist(request):
         'number': page_obj.number,
         'num_pages': paginator.num_pages,
     })
+
+
+@api_view(['POST'])
+def add_song_to_playlist(request, playlist_id, song_id):
+    try:
+        playlist = Playlist.objects.get(id=playlist_id)
+        song = Song.objects.get(id=song_id)
+        playlist.song.add(song)
+        playlist.save()
+        return Response({"message": "Song added to playlist successfully", "data": SongSerializer(song).data}, status=status.HTTP_200_OK)
+    except Playlist.DoesNotExist:
+
+        return Response({"error": "Playlist not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Song.DoesNotExist:
+        return Response({"error": "Song not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        print(str(e))
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
