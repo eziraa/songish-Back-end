@@ -84,3 +84,12 @@ def add_song_to_playlist(request, playlist_id, song_id):
     except Exception as e:
         print(str(e))
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['DELETE'])
+def remove_song_from_playlist(request, playlist_id, song_id):
+    playlist = get_object_or_404(Playlist, id=playlist_id)
+    song = get_object_or_404(Song, id=song_id)
+    playlist.song.remove(song)
+    playlist.save()
+    return Response({"message": "Song removed from playlist successfully", "data": SongSerializer(song).data}, status=status.HTTP_200_OK)
