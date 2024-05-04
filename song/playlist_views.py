@@ -38,3 +38,10 @@ def delete_playlist(request, playlist_id):
         return JsonResponse({'message': 'Playlist deleted successfully'}, status=200)
     except Playlist.DoesNotExist:
         return JsonResponse({'error': 'Playlist not found'}, status=404)
+
+
+@api_view(['GET'])
+def getPlaylists(request, user_id):
+    playlists = Playlist.objects.filter(customer_id=user_id)
+    serializer = PlaylistSerializer(playlists, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
