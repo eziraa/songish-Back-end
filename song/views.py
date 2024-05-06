@@ -117,3 +117,21 @@ def song_detail(request):
     elif request.method == 'DELETE':
         song.delete()
         return Response(status=204)
+
+
+@api_view(['POST'])
+def add_song_to_favorite(request, user_id, song_id):
+    try:
+        print(user_id, song_id)
+        customer = Customer.objects.get(id=user_id)
+        song = Song.objects.get(id=song_id)
+        customer.favorite_songs.add(song)
+        customer.save()
+        return JsonResponse(SongSerializer(song).data, status=status.HTTP_200_OK)
+    except Customer.DoesNotExist:
+
+        return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Song.DoesNotExist:
+        return Response({"error": "Song not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
