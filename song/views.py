@@ -142,3 +142,12 @@ def get_your_favorite_songs(request, user_id):
     user = get_object_or_404(Customer, id=user_id)
     serializer = SongSerializer(user.favorite_songs, many=True)
     return JsonResponse(serializer.data, safe=False)
+
+
+@api_view(['DELETE'])
+def remove_song_from_favorite(request, user_id, song_id):
+    customer = get_object_or_404(Customer, id=user_id)
+    song = get_object_or_404(Song, id=song_id)
+    customer.favorite_songs.remove(song)
+    customer.save()
+    return JsonResponse(SongSerializer(song).data, status=status.HTTP_200_OK)
