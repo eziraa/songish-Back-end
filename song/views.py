@@ -135,3 +135,10 @@ def add_song_to_favorite(request, user_id, song_id):
         return Response({"error": "Song not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def get_your_favorite_songs(request, user_id):
+    user = get_object_or_404(Customer, id=user_id)
+    serializer = SongSerializer(user.favorite_songs, many=True)
+    return JsonResponse(serializer.data, safe=False)
