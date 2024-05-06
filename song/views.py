@@ -151,3 +151,11 @@ def remove_song_from_favorite(request, user_id, song_id):
     customer.favorite_songs.remove(song)
     customer.save()
     return JsonResponse(SongSerializer(song).data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_my_songs(request, user_id):
+    user = get_object_or_404(Customer, id=user_id)
+    songs = user.songs
+    serializer = SongSerializer(songs, many=True)
+    return JsonResponse(serializer.data, safe=False)
