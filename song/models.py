@@ -14,7 +14,7 @@ class Customer(models.Model):
 
 
     def __str__(self):
-        return self.name
+        return self.fullName
 class Song(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=200)
