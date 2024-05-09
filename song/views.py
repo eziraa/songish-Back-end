@@ -139,7 +139,6 @@ class LogIndView(View):
             else:
                 return JsonResponse({"error": "Password is incorrect."}, status=400)
         except ObjectDoesNotExist:
-            print("object does not exist")
             return JsonResponse({"error": "User does not exist not found."}, status=404)
 
 

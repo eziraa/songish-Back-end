@@ -19,10 +19,8 @@ from .models import Playlist, Customer
 @api_view(["DELETE"])
 def delete_playlist(request, playlist_id):
     try:
-
         playlist = Playlist.objects.get(id=playlist_id)
         playlist.delete()
-
         return JsonResponse({'message': 'Playlist deleted successfully'}, status=200)
     except Playlist.DoesNotExist:
         return JsonResponse({'error': 'Playlist not found'}, status=404)
@@ -93,7 +91,7 @@ def remove_song_from_playlist(request, playlist_id, song_id):
     song = get_object_or_404(Song, id=song_id)
     playlist.song.remove(song)
     playlist.save()
-    return Response({"message": "Song removed from playlist successfully", "data": SongSerializer(song).data}, status=status.HTTP_200_OK)
+    return JsonResponse( SongSerializer(song).data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
