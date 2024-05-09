@@ -69,7 +69,6 @@ def song_detail(request):
         return Response(status=204)
 
 
-# class to return detail of one Song and to delete Song
 
 
 class GetSongsView(View):
@@ -103,24 +102,14 @@ class SongViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows songs to be viewed or edited.
     """
-    print("SongViewSet")
     queryset = Song.objects.all()
     serializer_class = SongSerializer
-    print("SongViewSet")
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AddSongView(View):
     def post(self, request):
         try:
-            # data = json.loads(request.body)
-            # title = data.get('title')
-            # album = data.get('title')
-            # artist = data.get('title')
-            # duration = data.get('duration')
-            # song_url = data.get('title')
-            # release_date = data.get('title')
-            # user_id = data.get('title')
             data = json.loads(request.body)
             customer_id = data.get('user_id')
             song_data = {k: v for k, v in data.items() if k != 'user_id'}
