@@ -57,6 +57,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "addissbackend.urls"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://addis-software-test-front-end-2.onrender.com"
 ]
 TEMPLATES = [
     {
