@@ -130,10 +130,6 @@ class LogIndView(View):
             password = data.get('password')
             customer = Customer.objects.get(email=email)
             if check_password(password, customer.password):
-                # favorite_songs_i = [
-                #     song.id for song in customer.favorite_songs]
-                # my__songs_i = [
-                #     song.id for song in customer.favorite_songs]
                 serializer = CustomerSerializer(customer)
                 return JsonResponse(serializer.data, safe=False)
             else:
@@ -157,8 +153,9 @@ class SignUpView(View):
             customer = Customer(fullName=fullName, password=make_password(
                 password), email=email, gender=gender)
             result = customer.save()
-            print(CustomerSerializer(customer).data)
-            return JsonResponse(CustomerSerializer(result).data, status=201)
+            customer = Customer.objects.get(email=email)
+            serializer = CustomerSerializer(customer)
+            return JsonResponse(serializer.data, safe=False, status=201)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON."}, status=400)
 class UpdateSongView(View):
