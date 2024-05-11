@@ -91,7 +91,7 @@ def remove_song_from_playlist(request, playlist_id, song_id):
     song = get_object_or_404(Song, id=song_id)
     playlist.song.remove(song)
     playlist.save()
-    return JsonResponse( SongSerializer(song).data, status=status.HTTP_200_OK)
+    return JsonResponse(SongSerializer(song).data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

@@ -1,4 +1,5 @@
 import json
+import os
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Song
@@ -13,7 +14,6 @@ from django.utils.decorators import method_decorator
 import json
 from rest_framework import viewsets
 from rest_framework import status
-
 
 
 from song.models import *
@@ -44,6 +44,7 @@ def song_create(request):
     serializer = SongSerializer(playlist)
     return JsonResponse(serializer.data, status=201)
 
+
 @api_view(['GET', 'PUT', 'DELETE'])
 def song_detail(request):
     try:
@@ -58,17 +59,17 @@ def song_detail(request):
 
     elif request.method == 'PUT':
         serializer = SongSerializer(song, data=request.data)
-        print(request.data)
         if serializer.is_valid():
+            file_path = song.song_file.path
             serializer.save()
+            if os.path.isfile(file_path):
+                os.remove(file_path)
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
 
     elif request.method == 'DELETE':
         song.delete()
         return Response(status=204)
-
-
 
 
 class GetSongsView(View):
@@ -121,6 +122,8 @@ class AddSongView(View):
             return JsonResponse({"error": "Playlist not found."}, status=404)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON."}, status=400)
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class LogIndView(View):
     def post(self, request):
@@ -136,7 +139,6 @@ class LogIndView(View):
                 return JsonResponse({"error": "Password is incorrect."}, status=400)
         except ObjectDoesNotExist:
             return JsonResponse({"error": "User does not exist not found."}, status=404)
-
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -158,6 +160,8 @@ class SignUpView(View):
             return JsonResponse(serializer.data, safe=False, status=201)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON."}, status=400)
+
+
 class UpdateSongView(View):
     def post(self, request, *args, **kwargs):
         try:
@@ -195,7 +199,10 @@ def delete_song(request, song_id):
     try:
         song = Song.objects.get(id=song_id)
         song.delete()
-        return JsonResponse({'message': 'Playlist deleted successfully'}, status=200)
+        file_path = song.song_file.path
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+        return JsonResponse(SongSerializer(song).data, {'message': 'Playlist deleted successfully'}, status=200)
     except Playlist.DoesNotExist:
         return JsonResponse({'error': 'Playlist not found'}, status=404)
 
