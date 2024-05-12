@@ -198,14 +198,16 @@ class DeleteSongView(View):
 def delete_song(request, song_id):
     try:
         song = Song.objects.get(id=song_id)
+        # Serialize the song before deletion
+        song_data = SongSerializer(song).data
         song.delete()
         file_path = song.song_file.path
         if os.path.isfile(file_path):
             os.remove(file_path)
-        return JsonResponse(SongSerializer(song).data, {'message': 'Playlist deleted successfully'}, status=200)
+        # Return the serialized data
+        return JsonResponse(song_data, status=200)
     except Playlist.DoesNotExist:
-        return JsonResponse({'error': 'Playlist not found'}, status=404)
-
+        return JsonResponse({'error': 'Song not found'}, status=404)
 
 @api_view(['POST'])
 def add_song_to_favorite(request, user_id, song_id):
